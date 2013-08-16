@@ -28,6 +28,7 @@ Let’s run neopi.py with the -h flag to see the options.
 	  -l, --longestword     Run longest word test
 	  -c, --ic              Run IC test
 	  -A, --auto            Run auto file extension tests
+	  -L, --symlinks	Scan symlinks
 
 Let’s break down the options into greater detail.
 
@@ -45,6 +46,9 @@ This flag can be set to run only the longest word test.
 
 	-c, --ic
 This flag can be set to run only the Index of Coincidence test.  
+
+	-L, --symlinks
+This flag will cause NeoPI to scan symlinks
 
 	-A, --auto 
 This flag runs an auto generated regular expression that contains many common web application file extensions.    This list is by no means comprehensive but does include a good ‘best effort’ scan if you are unsure of what web application languages your server is running.  The current list of  extensions are included below:
