@@ -18,8 +18,43 @@ import re
 import csv
 import zlib
 import time
-from collections import defaultdict
+
 from optparse import OptionParser
+
+class defaultdict(dict):
+        def __init__(self, default_factory=None, *a, **kw):
+            if (default_factory is not None and
+                not hasattr(default_factory, '__call__')):
+                raise TypeError('first argument must be callable')
+            dict.__init__(self, *a, **kw)
+            self.default_factory = default_factory
+        def __getitem__(self, key):
+            try:
+                return dict.__getitem__(self, key)
+            except KeyError:
+                return self.__missing__(key)
+        def __missing__(self, key):
+            if self.default_factory is None:
+                raise KeyError(key)
+            self[key] = value = self.default_factory()
+            return value
+        def __reduce__(self):
+            if self.default_factory is None:
+                args = tuple()
+            else:
+                args = self.default_factory,
+            return type(self), args, None, None, self.items()
+        def copy(self):
+            return self.__copy__()
+        def __copy__(self):
+            return type(self)(self.default_factory, self)
+        def __deepcopy__(self, memo):
+            import copy
+            return type(self)(self.default_factory,
+                              copy.deepcopy(self.items()))
+        def __repr__(self):
+            return 'defaultdict(%s, %s)' % (self.default_factory,
+                                            dict.__repr__(self))
 
 #
 # Globals
@@ -98,7 +133,7 @@ class LanguageIC:
        print "\n[[ Top %i lowest IC files ]]" % (count)
        if (count > len(self.results)): count = len(self.results)
        for x in range(count):
-           print ' {0:>7.4f}        {1}'.format(self.results[x]["value"], self.results[x]["filename"])
+           print ' %s        %s' % (self.results[x]["value"], self.results[x]["filename"])
        return
 
 class Entropy:
@@ -132,7 +167,7 @@ class Entropy:
        print "\n[[ Top %i entropic files for a given search ]]" % (count)
        if (count > len(self.results)): count = len(self.results)
        for x in range(count):
-           print ' {0:>7.4f}        {1}'.format(self.results[x]["value"], self.results[x]["filename"])
+           print ' %s        %s' % (self.results[x]["value"], self.results[x]["filename"])
        return
 
 class LongestWord:
@@ -167,7 +202,7 @@ class LongestWord:
        print "\n[[ Top %i longest word files ]]" % (count)
        if (count > len(self.results)): count = len(self.results)
        for x in range(count):
-           print ' {0:>7}        {1}'.format(self.results[x]["value"], self.results[x]["filename"])
+           print ' %s        %s' % (self.results[x]["value"], self.results[x]["filename"])
        return
 
 class SignatureNasty:
@@ -196,7 +231,7 @@ class SignatureNasty:
        print "\n[[ Top %i signature match counts ]]" % (count)
        if (count > len(self.results)): count = len(self.results)
        for x in range(count):
-           print ' {0:>7}        {1}'.format(self.results[x]["value"], self.results[x]["filename"])
+           print ' %s        %s' % (self.results[x]["value"], self.results[x]["filename"])
        return
 
 class SignatureSuperNasty:
@@ -224,7 +259,7 @@ class SignatureSuperNasty:
        print "\n[[ Top %i SUPER-signature match counts (These are usually bad!) ]]" % (count)
        if (count > len(self.results)): count = len(self.results)
        for x in range(count):
-           print ' {0:>7}        {1}'.format(self.results[x]["value"], self.results[x]["filename"])
+           print ' %s        %s' % (self.results[x]["value"], self.results[x]["filename"])
        return
 
 class UsesEval:
@@ -253,7 +288,7 @@ class UsesEval:
       print "\n[[ Top %i eval match counts ]]" % (count)
       if (count > len(self.results)): count = len(self.results)
       for x in range(count):
-        print ' {0:>7}          {1}'.format(self.results[x]["value"], self.results[x]["filename"])
+        print ' %s          %s' % (self.results[x]["value"], self.results[x]["filename"])
       return
 
 
@@ -282,7 +317,7 @@ class Compression:
        print "\n[[ Top %i compression match counts ]]" % (count)
        if (count > len(self.results)): count = len(self.results)
        for x in range(count):
-           print ' {0:>7.4f}        {1}'.format(self.results[x]["value"], self.results[x]["filename"])
+           print ' %s        %s' % (self.results[x]["value"], self.results[x]["filename"])
        return
 
 def resultsAddRank(results):
@@ -488,7 +523,7 @@ if __name__ == "__main__":
    rank_list = {}
    for test in tests:
        test.sort()
-       test.printer(10)
+       test.printer(20)
        for file in test.results:
            rank_list[file["filename"]] = rank_list.setdefault(file["filename"], 0) + file["rank"]
 
@@ -498,5 +533,5 @@ if __name__ == "__main__":
    count = 10
    if (count > len(rank_sorted)): count = len(rank_sorted)
    for x in range(count):
-       print ' {0:>7}        {1}'.format(rank_sorted[x][1], rank_sorted[x][0])
+       print ' %s        %s' % (rank_sorted[x][1], rank_sorted[x][0])
    
