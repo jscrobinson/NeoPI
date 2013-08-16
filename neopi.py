@@ -303,7 +303,6 @@ class SearchFile:
 	"""Generator that searches a given filepath with an optional regular
 	expression and returns the filepath and filename"""
 	def search_file_path(self, args, valid_regex, followsymlinks):
-		print followsymlinks
 		for root, dirs, files in os.walk(args[0], True, None, followsymlinks):
 			for file in files:
 					filename = os.path.join(root, file)
